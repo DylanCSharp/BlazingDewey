@@ -1,0 +1,66 @@
+﻿@page "/"
+
+@inject NavigationManager navManager
+
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Buttons 
+
+<div class="row">
+    <div class="col-lg-4 col-md-12 col-sm-12">
+        <SfCard ID="HomeCard" Orientation="CardOrientation.Horizontal">
+            <CardContent>
+                <div>
+                    <div>
+                        Replacing Books
+                    </div>
+                    <br />
+                    <SfButton CssClass="float-right" OnClick="ReplaceBooks">View</SfButton>
+                </div>
+            </CardContent>
+        </SfCard>
+    </div>
+    <div class="col-lg-4 col-md-12 col-sm-12">
+        <SfCard ID="HomeCard" Orientation="CardOrientation.Horizontal">
+            <CardContent>
+                <div>
+                    <div>
+                        Identify Areas
+                    </div>
+                    <br />
+                    <SfButton CssClass="float-right" Disabled="true">View</SfButton>
+                </div>
+            </CardContent>
+        </SfCard>
+    </div>
+    <div class="col-lg-4 col-md-12 col-sm-12">
+        <SfCard ID="HomeCard" Orientation="CardOrientation.Horizontal">
+            <CardContent>
+                <div>
+                    <div>
+                        Find Call Numbers
+                    </div>
+                    <br />
+                    <SfButton CssClass="float-right" Disabled="true">View</SfButton>
+                </div>
+            </CardContent>
+        </SfCard>
+    </div>
+</div>
+<style>
+    #HomeCard {
+        min-height: 88vh;
+        border-radius: 10px;
+        box-shadow: 1px 1px 2px #0094ff;
+        margin: 1vh;
+    }
+</style>
+
+
+@code {
+
+    private void ReplaceBooks()
+    {
+        navManager.NavigateTo("dewey/replacebooksindex");
+    }
+}
+

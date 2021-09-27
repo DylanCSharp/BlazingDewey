@@ -1,0 +1,162 @@
+﻿@page "/dewey/replacebooksindex"
+
+@inject NavigationManager navManager
+@inject HttpClient Http
+
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Spinner
+@using Syncfusion.Blazor.Grids 
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Notifications 
+
+<SfToast @ref="ToastObj" ID="toast_type">
+    <ToastPosition X="Right" Y="Top"></ToastPosition>
+</SfToast>
+
+@if (SpinnerPage is false && DeweyPage is false)
+{
+    <div>
+        <SfCard ID="ReplaceBooksHomeCard">
+            <CardContent>
+                <div>
+                    <h5>Are you ready to roll these Deweys!?</h5>
+                    <br />
+                    <SfButton OnClick="@(() => GenerateCalls(10))">Roll It x10 Baby!</SfButton>
+                    <SfButton OnClick="@(() => GenerateCalls(20))">Roll It x20 Baby!</SfButton>
+                    <SfButton OnClick="@(() => GenerateCalls(30))">Roll It x30 Baby!</SfButton>
+                </div>
+            </CardContent>
+        </SfCard>
+    </div>
+}
+else if (SpinnerPage is true && DeweyPage is false)
+{
+    <div>
+        <SfCard ID="ReplaceBooksHomeCard">
+            <CardContent>
+                <div>
+                    <SfSpinner Size="50" Label="Generating Call Numbers" Visible="true" Type="SpinnerType.Bootstrap4"></SfSpinner>
+                </div>
+            </CardContent>
+        </SfCard>
+    </div>
+}
+else if (DeweyPage is true)
+{
+    <SfGrid DataSource="@GridDeweyPoints" @ref="BookOrderGrid" TValue="GridTaskModel" ID="Grid" RowHeight="65" AllowRowDragAndDrop="true" AllowReordering="true">
+        <SfToolbar @ref="Toolbar">
+            <ToolbarEvents Clicked="ToolbarClicked"></ToolbarEvents>
+            <ToolbarItems>
+                <ToolbarItem Type="ItemType.Button" Align="ItemAlign.Left" Id="submit" PrefixIcon="e-icons e-check" Text="Submit Your Order"></ToolbarItem>
+            </ToolbarItems>
+        </SfToolbar>
+        <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+        <GridEvents TValue="GridTaskModel" OnActionComplete="SubmitDeweyOrder"></GridEvents>
+        <GridEditSettings AllowAdding="true"></GridEditSettings>
+        <GridColumns>
+            <GridColumn  Field=@nameof(GridTaskModel.FinalAppendedDewey) HeaderText="Combined Dewey Decimal" IsPrimaryKey="true" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field=@nameof(GridTaskModel.DeweyPointOne) HeaderText="Broad Area" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field=@nameof(GridTaskModel.DeweyPointTwo) HeaderText="Topic" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn Field=@nameof(GridTaskModel.DeweyPointThree) HeaderText="Author" TextAlign="TextAlign.Center"></GridColumn>
+        </GridColumns>
+    </SfGrid>
+}
+
+<style>
+    #ReplaceBooksHomeCard {
+        min-height: 88vh;
+        border-radius: 10px;
+        box-shadow: 1px 1px 2px #0094ff;
+        margin: 1vh;
+    }
+
+    #Grid {
+        min-height: 88vh;
+        border-radius: 10px;
+        box-shadow: 1px 1px 2px #0094ff;
+        margin: 1vh;
+    }
+</style>
+
+
+@code {
+
+    #region declarations
+    const string chars = "0123456789";
+    const string charsLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    private bool SpinnerPage = false;
+    private bool DeweyPage = false;
+
+    private SfGrid<GridTaskModel> BookOrderGrid;
+    private SfToolbar Toolbar;
+    private SfToast ToastObj;
+
+    private Random random = new Random();
+
+    private List<GridTaskModel> GridDeweyPoints = new();
+    private List<string> StringDeweyPoints = new();
+
+    #endregion
+
+    #region functions
+    private async Task GenerateCalls(int amount)
+    {
+        SpinnerPage = true;
+        GridDeweyPoints.Clear();
+        for (int i = 0; i < amount; i++)
+        {
+            GridTaskModel model = new();
+            model.DeweyPointOne = RandomNumber(3);
+            model.DeweyPointTwo = RandomNumber(3);
+            model.DeweyPointThree = RandomString(random.Next(2, 4));
+            model.FinalAppendedDewey = $"{model.DeweyPointOne}.{model.DeweyPointTwo} {model.DeweyPointThree}";
+            GridDeweyPoints.Add(model);
+        }
+        await Task.Delay(500);
+        SpinnerPage = false;
+        DeweyPage = true;
+    }
+
+    private async Task SubmitDeweyOrder(Syncfusion.Blazor.Grids.ActionEventArgs<GridTaskModel> args)
+    {
+        args.Cancel = true;
+        if (args.RequestType == Syncfusion.Blazor.Grids.Action.Refresh)
+        {
+            List<GridTaskModel> model = new();
+            model = await BookOrderGrid.GetCurrentViewRecordsAsync();
+            var response = await Http.PostAsJsonAsync<List<GridTaskModel>>("api/replace/checkorder", model);
+            if (response.IsSuccessStatusCode)
+            {
+                await this.ToastObj.Show(new ToastModel { Title = $"Well Done!", Content = $"You ordered the Dewey Decimal Number System correctly!", CssClass = "e-toast-success", Icon = "e-success toast-icons", Timeout = 5000, ShowCloseButton = true });
+                SpinnerPage = false;
+                DeweyPage = false;
+            }
+            else
+            {
+                await this.ToastObj.Show(new ToastModel { Title = $"Oops!", Content = $"The Dewey Decimals have not been ordered properly. Try again!", CssClass = "e-toast-warning", Icon = "e-warning toast-icons", Timeout = 5000, ShowCloseButton = true });
+            }
+        }
+    }
+
+    private async Task ToolbarClicked(ClickEventArgs args)
+    {
+        if (args.Item.Id.Equals("submit"))
+        {
+            await Task.Delay(1);
+            BookOrderGrid.Refresh();
+        }
+    }
+
+    public string RandomNumber(int length)
+    {
+        return new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+    public string RandomString(int length)
+    {
+        return new string(Enumerable.Repeat(charsLetters, length).Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+    #endregion
+}
