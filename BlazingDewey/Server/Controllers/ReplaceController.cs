@@ -1,11 +1,8 @@
 ﻿using BlazingDewey.Shared;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BlazingDewey.Server.Controllers
 {
@@ -16,7 +13,7 @@ namespace BlazingDewey.Server.Controllers
     {
         public ReplaceController()
         {
-            
+
         }
 
         [Route("checkorder")]
