@@ -3,7 +3,7 @@
 @inject NavigationManager navManager
 
 @using Syncfusion.Blazor.Cards
-@using Syncfusion.Blazor.Buttons 
+@using Syncfusion.Blazor.Buttons
 
 <div class="row">
     <div class="col-lg-4 col-md-12 col-sm-12">
@@ -58,9 +58,17 @@
 
 @code {
 
+
+
     private void ReplaceBooks()
     {
         navManager.NavigateTo("dewey/replacebooksindex");
     }
+
+    protected override void OnInitialized()
+    {
+
+    }
 }
+
 

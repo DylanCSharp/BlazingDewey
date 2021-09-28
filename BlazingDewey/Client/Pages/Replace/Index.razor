@@ -3,12 +3,19 @@
 @inject NavigationManager navManager
 @inject HttpClient Http
 
+@implements IDisposable
+
 @using Syncfusion.Blazor.Cards
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Spinner
 @using Syncfusion.Blazor.Grids 
 @using Syncfusion.Blazor.Navigations
-@using Syncfusion.Blazor.Notifications 
+@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Inputs
+
+@using System.Timers
+@using System.Diagnostics
+@using System.ComponentModel.DataAnnotations  
 
 <SfToast @ref="ToastObj" ID="toast_type">
     <ToastPosition X="Right" Y="Top"></ToastPosition>
@@ -19,12 +26,64 @@
     <div>
         <SfCard ID="ReplaceBooksHomeCard">
             <CardContent>
-                <div>
-                    <h5>Are you ready to roll these Deweys!?</h5>
-                    <br />
-                    <SfButton OnClick="@(() => GenerateCalls(10))">Roll It x10 Baby!</SfButton>
-                    <SfButton OnClick="@(() => GenerateCalls(20))">Roll It x20 Baby!</SfButton>
-                    <SfButton OnClick="@(() => GenerateCalls(30))">Roll It x30 Baby!</SfButton>
+                <div class="row" style="text-align: center">
+                    <div class="col-lg-6 col-1 col-sm-1 col-md-6" style="margin-top: 20vh;">
+                        <h5>Choose your fate with these Deweys!?</h5>
+                        <br />
+                        <p>Pick your level and get started!</p>
+                        <p>
+                            Once you click the button, a timer will start. Lets see how you score against other librarians!
+                            <br />
+                            Please enter your name to capture your score!
+                        </p>
+                        <EditForm Model="formName" OnValidSubmit="@(() => GenerateCalls(formName.Difficulty))">
+                            <input class="form-control" type="text" @bind-value="formName.Name" Placeholder="Enter Name" required />
+                                <br />
+                            <select class="form-control" @bind="formName.Difficulty" required>
+                                <option value="@Difficulty.Easy">Easy (x10)</option>
+                                <option value="@Difficulty.Medium">Medium (x30)</option>
+                                <option value="@Difficulty.Hard">Hard (x50)</option>
+                                <option value="@Difficulty.Insanity">Insanity (x100)</option>
+                            </select>
+                            <br />
+                            <SfButton>Submit</SfButton>
+                        </EditForm>
+         
+                    </div>
+                    <div class="col-lg-6 col-1 col-sm-1 col-md-6" style="text-align: center">
+                        <p>Please note: Data will not be persisted if you refresh the browser as it is not in a database</p>
+                        <SfGrid DataSource="@ScoreboardList.GetScoreBoardScores().Where(x => x.Diffuculty.Equals(Difficulty.Easy)).OrderBy(x => x.TimeTaken)" ID="SmallGridEasy" TValue="ScoreboardClass" AllowReordering="false">
+                            <GridColumns>
+                                <GridColumn Field=@nameof(ScoreboardClass.FirstName) HeaderText="Name" IsPrimaryKey="true" TextAlign="TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(ScoreboardClass.Diffuculty) HeaderText=" Easy Difficulty" TextAlign="TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(ScoreboardClass.TimeTaken) HeaderText="Time" TextAlign="TextAlign.Center"></GridColumn>
+                            </GridColumns>
+                        </SfGrid>
+                        <br />
+                        <SfGrid DataSource="@ScoreboardList.GetScoreBoardScores().Where(x => x.Diffuculty.Equals(Difficulty.Medium)).OrderBy(x => x.TimeTaken)" ID="SmallGridMedium" TValue="ScoreboardClass" AllowReordering="false">
+                            <GridColumns>
+                                <GridColumn Field=@nameof(ScoreboardClass.FirstName) HeaderText="Name" IsPrimaryKey="true" TextAlign="TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(ScoreboardClass.Diffuculty) HeaderText="Medium Difficulty" TextAlign="TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(ScoreboardClass.TimeTaken) HeaderText="Time" TextAlign="TextAlign.Center"></GridColumn>
+                            </GridColumns>
+                        </SfGrid>
+                        <br />
+                        <SfGrid DataSource="@ScoreboardList.GetScoreBoardScores().Where(x => x.Diffuculty.Equals(Difficulty.Hard)).OrderBy(x => x.TimeTaken)" ID="SmallGridHard" TValue="ScoreboardClass" AllowReordering="false">
+                            <GridColumns>
+                                <GridColumn Field=@nameof(ScoreboardClass.FirstName) HeaderText="Name" IsPrimaryKey="true" TextAlign="TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(ScoreboardClass.Diffuculty) HeaderText=" Hard Difficulty" TextAlign="TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(ScoreboardClass.TimeTaken) HeaderText="Time" TextAlign="TextAlign.Center"></GridColumn>
+                            </GridColumns>
+                        </SfGrid>
+                        <br />
+                        <SfGrid DataSource="@ScoreboardList.GetScoreBoardScores().Where(x => x.Diffuculty.Equals(Difficulty.Insanity)).OrderBy(x => x.TimeTaken)" ID="SmallGridInsane" TValue="ScoreboardClass" AllowReordering="false">
+                            <GridColumns>
+                                <GridColumn Field=@nameof(ScoreboardClass.FirstName) HeaderText="Name" IsPrimaryKey="true" TextAlign="TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(ScoreboardClass.Diffuculty) HeaderText="Insane Difficulty" TextAlign="TextAlign.Center"></GridColumn>
+                                <GridColumn Field=@nameof(ScoreboardClass.TimeTaken) HeaderText="Time" TextAlign="TextAlign.Center"></GridColumn>
+                            </GridColumns>
+                        </SfGrid>
+                    </div>
                 </div>
             </CardContent>
         </SfCard>
@@ -44,23 +103,32 @@ else if (SpinnerPage is true && DeweyPage is false)
 }
 else if (DeweyPage is true)
 {
-    <SfGrid DataSource="@GridDeweyPoints" @ref="BookOrderGrid" TValue="GridTaskModel" ID="Grid" RowHeight="65" AllowRowDragAndDrop="true" AllowReordering="true">
-        <SfToolbar @ref="Toolbar">
-            <ToolbarEvents Clicked="ToolbarClicked"></ToolbarEvents>
-            <ToolbarItems>
-                <ToolbarItem Type="ItemType.Button" Align="ItemAlign.Left" Id="submit" PrefixIcon="e-icons e-check" Text="Submit Your Order"></ToolbarItem>
-            </ToolbarItems>
-        </SfToolbar>
-        <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
-        <GridEvents TValue="GridTaskModel" OnActionComplete="SubmitDeweyOrder"></GridEvents>
-        <GridEditSettings AllowAdding="true"></GridEditSettings>
-        <GridColumns>
-            <GridColumn  Field=@nameof(GridTaskModel.FinalAppendedDewey) HeaderText="Combined Dewey Decimal" IsPrimaryKey="true" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field=@nameof(GridTaskModel.DeweyPointOne) HeaderText="Broad Area" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field=@nameof(GridTaskModel.DeweyPointTwo) HeaderText="Topic" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field=@nameof(GridTaskModel.DeweyPointThree) HeaderText="Author" TextAlign="TextAlign.Center"></GridColumn>
-        </GridColumns>
-    </SfGrid>
+  
+    <p class="text-center">Drag and Drop the items in ascending order by using the tool on the left of every item in the grid!</p>
+    <p class="text-center">Once complete, click on submit your chosen order on the top left of the grid!</p>
+    <h5 class="text-center text-capitalize">Time Elapsed: @TimeSpan.FromSeconds(time.TotalSeconds).ToString("%s") seconds</h5>
+    <div class="text-center">
+        <button class="btn btn-danger btn-sm" @onclick="ReturnPhase">Exit Game</button>
+    </div>
+    <div>
+        <SfGrid DataSource="@GridDeweyPoints" @ref="BookOrderGrid" TValue="GridTaskModel" ID="Grid" Height="100%" RowHeight="60" AllowRowDragAndDrop="true" AllowReordering="true">
+            <SfToolbar @ref="Toolbar">
+                <ToolbarEvents Clicked="ToolbarClicked"></ToolbarEvents>
+                <ToolbarItems>
+                    <ToolbarItem Type="ItemType.Button" Align="ItemAlign.Left" Id="submit" PrefixIcon="e-icons e-check" Text="Submit Your Order"></ToolbarItem>
+                </ToolbarItems>
+            </SfToolbar>
+            <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+            <GridEvents TValue="GridTaskModel" OnActionComplete="SubmitDeweyOrder"></GridEvents>
+            <GridEditSettings AllowAdding="true"></GridEditSettings>
+            <GridColumns>
+                <GridColumn Field=@nameof(GridTaskModel.FinalAppendedDewey) HeaderText="Combined Dewey Decimal" IsPrimaryKey="true" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field=@nameof(GridTaskModel.DeweyPointOne) HeaderText="Broad Area" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field=@nameof(GridTaskModel.DeweyPointTwo) HeaderText="Topic" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field=@nameof(GridTaskModel.DeweyPointThree) HeaderText="Author" TextAlign="TextAlign.Center"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
 }
 
 <style>
@@ -72,9 +140,31 @@ else if (DeweyPage is true)
     }
 
     #Grid {
-        min-height: 88vh;
+        min-height: 80vh;
         border-radius: 10px;
         box-shadow: 1px 1px 2px #0094ff;
+        margin: 1vh;
+    }
+
+    #SmallGridEasy {
+        border-radius: 10px;
+        box-shadow: 1px 1px 2px #5ee24f;
+        margin: 1vh;
+    }
+
+    #SmallGridHard {
+        border-radius: 10px;
+        box-shadow: 1px 1px 2px #3a972f;
+        margin: 1vh;
+    }
+    #SmallGridMedium {
+        border-radius: 10px;
+        box-shadow: 1px 1px 2px #ffd800;
+        margin: 1vh;
+    }
+    #SmallGridInsane {
+        border-radius: 10px;
+        box-shadow: 1px 1px 2px #ff0000;
         margin: 1vh;
     }
 </style>
@@ -83,6 +173,7 @@ else if (DeweyPage is true)
 @code {
 
     #region declarations
+
     const string chars = "0123456789";
     const string charsLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -98,11 +189,44 @@ else if (DeweyPage is true)
     private List<GridTaskModel> GridDeweyPoints = new();
     private List<string> StringDeweyPoints = new();
 
+    private Timer timer;
+    private Stopwatch stopwatch;
+    private TimeSpan time;
+
+    private FormName formName = new();
+
+    private SortingScoreboard sorting = new();
+
+    public class FormName
+    {
+        [Required]
+        public string Name { get; set; }
+        public Difficulty Difficulty { get; set; }
+    }
+
     #endregion
 
     #region methods
-    private async Task GenerateCalls(int amount)
+
+    private async Task GenerateCalls(Difficulty difficulty)
     {
+        int amount = 0;
+        if (difficulty.Equals(Difficulty.Easy))
+        {
+            amount = 10;
+        }
+        else if (difficulty.Equals(Difficulty.Medium))
+        {
+            amount = 30;
+        }
+        else if (difficulty.Equals(Difficulty.Hard))
+        {
+            amount = 50;
+        }
+        else if (difficulty.Equals(Difficulty.Insanity))
+        {
+            amount = 100;
+        }
         SpinnerPage = true;
         GridDeweyPoints.Clear();
         for (int i = 0; i < amount; i++)
@@ -114,6 +238,12 @@ else if (DeweyPage is true)
             model.FinalAppendedDewey = $"{model.DeweyPointOne}.{model.DeweyPointTwo} {model.DeweyPointThree}";
             GridDeweyPoints.Add(model);
         }
+        timer = new();
+        stopwatch = new();
+        timer.Interval = 1000;
+        timer.Elapsed += TimerOnElapsed;
+        timer.Start();
+        stopwatch.Start();
         await Task.Delay(500);
         SpinnerPage = false;
         DeweyPage = true;
@@ -129,9 +259,14 @@ else if (DeweyPage is true)
             var response = await Http.PostAsJsonAsync<List<GridTaskModel>>("api/replace/checkorder", model);
             if (response.IsSuccessStatusCode)
             {
-                await this.ToastObj.Show(new ToastModel { Title = $"Well Done!", Content = $"You ordered the Dewey Decimal Number System correctly!", CssClass = "e-toast-success", Icon = "e-success toast-icons", Timeout = 5000, ShowCloseButton = true });
+                stopwatch.Stop();
+                timer.Stop();
+                ScoreboardList.scoreboardList.Add(new ScoreboardClass { FirstName = formName.Name, Diffuculty = formName.Difficulty, TimeTaken = new TimeSpan(time.Hours, time.Minutes, Convert.ToInt32(time.TotalSeconds)) });
+                await this.ToastObj.Show(new ToastModel { Title = $"Well Done!", Content = $"You ordered the Dewey Decimal Number System correctly in {Convert.ToInt32(time.TotalSeconds)} seconds!", CssClass = "e-toast-success", Icon = "e-success toast-icons", Timeout = 5000, ShowCloseButton = true });
                 SpinnerPage = false;
                 DeweyPage = false;
+                time = new();
+                formName = new();
             }
             else
             {
@@ -146,6 +281,30 @@ else if (DeweyPage is true)
         {
             await Task.Delay(1);
             BookOrderGrid.Refresh();
+        }
+    }
+
+    public void ReturnPhase()
+    {
+        timer.Stop();
+        stopwatch.Stop();
+        SpinnerPage = false;
+        DeweyPage = false;
+        time = new();
+        formName = new();
+    }
+
+    private void TimerOnElapsed(object sender, ElapsedEventArgs args)
+    {
+        time = stopwatch.Elapsed;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (timer is not null)
+        {
+            timer.Dispose();
         }
     }
 
