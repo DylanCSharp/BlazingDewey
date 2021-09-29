@@ -100,29 +100,33 @@ else if (SpinnerPage is true && DeweyPage is false)
 }
 else if (DeweyPage is true)
 {
-    <h5 class="text-center text-capitalize">Time Elapsed: @TimeSpan.FromSeconds(time.TotalSeconds).ToString("%s") seconds</h5>
-    <div class="text-center">
-        <button class="btn btn-danger btn-sm" @onclick="ReturnPhase">Exit Game</button>
-    </div>
-    <div>
-        <SfGrid DataSource="@GridDeweyPoints" @ref="BookOrderGrid" TValue="GridTaskModel" ID="Grid" Height="100%" RowHeight="60" AllowRowDragAndDrop="true" AllowReordering="true">
-            <SfToolbar @ref="Toolbar">
-                <ToolbarEvents Clicked="ToolbarClicked"></ToolbarEvents>
-                <ToolbarItems>
-                    <ToolbarItem Type="ItemType.Button" Align="ItemAlign.Left" Id="submit" PrefixIcon="e-icons e-check" Text="Submit Your Order"></ToolbarItem>
-                </ToolbarItems>
-            </SfToolbar>
-            <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
-            <GridEvents TValue="GridTaskModel" OnActionComplete="SubmitDeweyOrder"></GridEvents>
-            <GridEditSettings AllowAdding="true"></GridEditSettings>
-            <GridColumns>
-                <GridColumn Field=@nameof(GridTaskModel.FinalAppendedDewey) HeaderText="Combined Dewey Decimal" IsPrimaryKey="true" TextAlign="TextAlign.Center"></GridColumn>
-                <GridColumn Field=@nameof(GridTaskModel.DeweyPointOne) HeaderText="Broad Area" TextAlign="TextAlign.Center"></GridColumn>
-                <GridColumn Field=@nameof(GridTaskModel.DeweyPointTwo) HeaderText="Topic" TextAlign="TextAlign.Center"></GridColumn>
-                <GridColumn Field=@nameof(GridTaskModel.DeweyPointThree) HeaderText="Author" TextAlign="TextAlign.Center"></GridColumn>
-            </GridColumns>
-        </SfGrid>
-    </div>
+<h5 class="text-center text-capitalize">Time Elapsed: @TimeSpan.FromSeconds(time.TotalSeconds).ToString("%s") seconds</h5>
+<div class="text-center">
+    <button class="btn btn-danger btn-sm" @onclick="ReturnPhase">Exit Game</button>
+</div>
+<div>
+    <SfCard ID="ReplaceBooksHomeCard">
+        <CardContent>
+            <SfGrid DataSource="@GridDeweyPoints" @ref="BookOrderGrid" TValue="GridTaskModel" ID="Grid" Height="100%" RowHeight="55" AllowRowDragAndDrop="true" AllowReordering="true">
+                <SfToolbar @ref="Toolbar">
+                    <ToolbarEvents Clicked="ToolbarClicked"></ToolbarEvents>
+                    <ToolbarItems>
+                        <ToolbarItem Type="ItemType.Button" Align="ItemAlign.Left" Id="submit" PrefixIcon="e-icons e-check" Text="Submit Your Order"></ToolbarItem>
+                    </ToolbarItems>
+                </SfToolbar>
+                <GridSelectionSettings Type="Syncfusion.Blazor.Grids.SelectionType.Single"></GridSelectionSettings>
+                <GridEvents TValue="GridTaskModel" OnActionComplete="SubmitDeweyOrder"></GridEvents>
+                <GridEditSettings AllowAdding="true"></GridEditSettings>
+                <GridColumns>
+                    <GridColumn Field=@nameof(GridTaskModel.FinalAppendedDewey) HeaderText="Combined Dewey Decimal" IsPrimaryKey="true" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field=@nameof(GridTaskModel.DeweyPointOne) HeaderText="Broad Area" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field=@nameof(GridTaskModel.DeweyPointTwo) HeaderText="Topic" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field=@nameof(GridTaskModel.DeweyPointThree) HeaderText="Author" TextAlign="TextAlign.Center"></GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </CardContent>
+    </SfCard>
+</div>
 }
 
 <style>
