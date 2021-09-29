@@ -32,7 +32,6 @@
                         <p>Pick your level and get started!</p>
                         <p>
                             Once you click the button, a timer will start. Lets see how you score against other librarians!
-                            <br />
                             Please enter your name to capture your score!
                         </p>
                         <EditForm Model="formName" OnValidSubmit="@(() => GenerateCalls(formName.Difficulty))">
@@ -101,9 +100,6 @@ else if (SpinnerPage is true && DeweyPage is false)
 }
 else if (DeweyPage is true)
 {
-  
-    <p class="text-center">Drag and Drop the items in ascending order by using the tool on the left of every item in the grid!</p>
-    <p class="text-center">Once complete, click on submit your chosen order on the top left of the grid!</p>
     <h5 class="text-center text-capitalize">Time Elapsed: @TimeSpan.FromSeconds(time.TotalSeconds).ToString("%s") seconds</h5>
     <div class="text-center">
         <button class="btn btn-danger btn-sm" @onclick="ReturnPhase">Exit Game</button>
@@ -133,36 +129,36 @@ else if (DeweyPage is true)
     #ReplaceBooksHomeCard {
         min-height: 88vh;
         border-radius: 10px;
-        box-shadow: 1px 1px 2px #0094ff;
+        box-shadow: 1px 1px 2px #808080;
         margin: 1vh;
     }
 
     #Grid {
         min-height: 80vh;
         border-radius: 10px;
-        box-shadow: 1px 1px 2px #0094ff;
+        box-shadow: 1px 1px 2px #808080;
         margin: 1vh;
     }
 
     #SmallGridEasy {
         border-radius: 10px;
-        box-shadow: 1px 1px 2px #5ee24f;
+        box-shadow: 1px 1px 2px #808080;
         margin: 1vh;
     }
 
     #SmallGridHard {
         border-radius: 10px;
-        box-shadow: 1px 1px 2px #3a972f;
+        box-shadow: 1px 1px 2px #808080;
         margin: 1vh;
     }
     #SmallGridMedium {
         border-radius: 10px;
-        box-shadow: 1px 1px 2px #ffd800;
+        box-shadow: 1px 1px 2px #808080;
         margin: 1vh;
     }
     #SmallGridInsane {
         border-radius: 10px;
-        box-shadow: 1px 1px 2px #ff0000;
+        box-shadow: 1px 1px 2px #808080;
         margin: 1vh;
     }
 </style>
@@ -209,21 +205,20 @@ else if (DeweyPage is true)
     private async Task GenerateCalls(Difficulty difficulty)
     {
         int amount = 0;
-        if (difficulty.Equals(Difficulty.Easy))
+        switch (difficulty)
         {
-            amount = 10;
-        }
-        else if (difficulty.Equals(Difficulty.Medium))
-        {
-            amount = 30;
-        }
-        else if (difficulty.Equals(Difficulty.Hard))
-        {
-            amount = 50;
-        }
-        else if (difficulty.Equals(Difficulty.Insanity))
-        {
-            amount = 100;
+            case Difficulty.Easy:
+                amount = 10;
+                break;
+            case Difficulty.Medium:
+                amount = 30;
+                break;
+            case Difficulty.Hard:
+                amount = 50;
+                break;
+            case Difficulty.Insanity:
+                amount = 100;
+                break;
         }
         SpinnerPage = true;
         GridDeweyPoints.Clear();
@@ -317,3 +312,5 @@ else if (DeweyPage is true)
     }
     #endregion
 }
+    
+

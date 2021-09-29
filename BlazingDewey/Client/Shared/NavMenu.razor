@@ -1,5 +1,5 @@
 ﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">BlazingDewey</a>
+    <a class="navbar-brand" href="" style="color: white"><img class="img-fluid" style="height: 2.5rem; padding-left: 2vh;" src="/images/icon.png" />&nbsp;Blazing Books</a>
     <div class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </div>
@@ -9,7 +9,12 @@
     <ul class="nav flex-column">
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home Portal
+                <span class="oi oi-home" aria-hidden="true"></span> Portal
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" Match="NavLinkMatch.All">
+                <span class="oi oi-pulse" aria-hidden="true"></span> Coming Soon...
             </NavLink>
         </li>
     </ul>
