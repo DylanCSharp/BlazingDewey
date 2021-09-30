@@ -100,7 +100,7 @@ else if (SpinnerPage is true && DeweyPage is false)
 }
 else if (DeweyPage is true)
 {
-<h5 class="text-center text-capitalize">Time Elapsed: @TimeSpan.FromSeconds(time.TotalSeconds).ToString("%s") seconds</h5>
+<h5 class="text-center text-capitalize">Time Elapsed: @time seconds</h5>
 <div class="text-center">
     <button class="btn btn-danger btn-sm" @onclick="ReturnPhase">Exit Game</button>
 </div>
@@ -258,7 +258,7 @@ else if (DeweyPage is true)
             {
                 stopwatch.Stop();
                 timer.Stop();
-                ScoreboardList.scoreboardList.Add(new ScoreboardClass { FirstName = formName.Name, Diffuculty = formName.Difficulty, TimeTaken = new TimeSpan(time.Hours, time.Minutes, Convert.ToInt32(time.TotalSeconds)) });
+                ScoreboardList.scoreboardList.Add(new ScoreboardClass { FirstName = formName.Name, Diffuculty = formName.Difficulty, TimeTaken = new TimeSpan(time.Hours, time.Minutes, Convert.ToInt32(time.Seconds)) });
                 await this.ToastObj.Show(new ToastModel { Title = $"Well Done!", Content = $"You ordered the Dewey Decimal Number System correctly in {Convert.ToInt32(time.TotalSeconds)} seconds!", CssClass = "e-toast-success", Icon = "e-success toast-icons", Timeout = 5000, ShowCloseButton = true });
                 SpinnerPage = false;
                 DeweyPage = false;
