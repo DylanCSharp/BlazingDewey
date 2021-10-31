@@ -32,7 +32,7 @@
             </CardContent>
             <CardFooter>
                 <CardFooterContent>
-                    <SfButton CssClass="float-right" Disabled="true">View</SfButton>
+                    <SfButton CssClass="float-right" OnClick="IdentifyAreas">View</SfButton>
                 </CardFooterContent>
             </CardFooter>
         </SfCard>
@@ -55,7 +55,7 @@
 </div>
 <style>
     #HomeCard {
-        min-height: 88vh;
+        min-height: 87vh;
         border-radius: 10px;
         box-shadow: 1px 1px 2px #808080;
         margin: 1vh;
@@ -65,16 +65,19 @@
 
 @code {
 
+    protected override void OnInitialized()
+    {
 
+    }
 
     private void ReplaceBooks()
     {
         navManager.NavigateTo("dewey/replacebooksindex");
     }
 
-    protected override void OnInitialized()
+    private void IdentifyAreas()
     {
-
+        navManager.NavigateTo("dewey/identifyareasindex");
     }
 }
 

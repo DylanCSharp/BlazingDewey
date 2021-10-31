@@ -1,0 +1,119 @@
+﻿@page "/dewey/identifyareasindex"
+
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Kanban  
+
+<div id="IdentifyAreaHomeCard" style="background-color: white">
+    <div class="container-fluid">
+        <div class="pt-3">
+            <SfKanban @ref="kanbanReference" TValue="KanbanModel" KeyField="Status" DataSource="PossibleAnswersDictionary.Values.ToList()">
+                <KanbanColumns>
+                    @foreach (var item in columnData)
+                    {
+                        <KanbanColumn HeaderText="@item.HeaderText" KeyField="@item.KeyField"></KanbanColumn>
+                    }
+                </KanbanColumns>
+                <KanbanCardSettings HeaderField="CallNumberTitle" ContentField="Summary"></KanbanCardSettings>
+            </SfKanban>
+        </div>
+    </div>
+</div>
+<style>
+    #IdentifyAreaHomeCard {
+        min-height: 87vh;
+        border-radius: 10px;
+        box-shadow: 1px 1px 2px #808080;
+        margin: 1vh;
+    }
+</style>
+
+@code {
+
+    #region declarations
+    const string numbers = "0123456789";
+    public SfKanban<KanbanModel> kanbanReference;
+
+    //Boolean for game mode
+    public bool DeweyToDescription { get; set; }
+
+    //Random
+    public Random RandomMode { get; set; } = new();
+
+    //Lists
+    public List<ColumnModel> columnData = new();
+
+    //Dictionaries
+    public Dictionary<int, KanbanModel> PossibleAnswersDictionary { get; set; } = new();
+    public Dictionary<int, string> Categories = new()
+    {
+        { 0, "General Knowledge" },
+        { 1, "Philosophy and Psychology" },
+        { 2, "Religion" },
+        { 3, "Social Sciences" },
+        { 4, "Languages"},
+        { 5, "Science"},
+        { 6, "Technology"},
+        { 7, "Arts and Recreation"},
+        { 8, "Literature" },
+        { 9, "History and Geography"}
+    };
+    #endregion
+
+    #region functions
+    protected override void OnInitialized()
+    {
+        //Randomly chooses if it is matching deweys to descriptions or vice versa to promote replayability
+        int modeChosen = RandomMode.Next(1, 3);
+        switch (modeChosen)
+        {
+            case 1:
+                DeweyToDescription = true;
+
+                //Adding Columns
+                int columnCount = 0;
+                columnData.Add(new ColumnModel { HeaderText = RandomNumber(3), KeyField = new List<string>() { $"1" } });
+                while (columnData.Count < 4)
+                {
+                    string randomNumber = RandomNumber(3);
+                    string checkFirstNumber = randomNumber.Remove(1, 2);
+                    Console.WriteLine(checkFirstNumber);
+
+                    if (!columnData.ElementAt(columnCount).HeaderText.StartsWith(Convert.ToChar(checkFirstNumber)))
+                    {
+                        Console.WriteLine("Executing");
+                        columnData.Add(new ColumnModel { HeaderText = randomNumber, KeyField = new List<string>() { $"{columnCount + 2}" } });
+                        columnCount++;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Cannot insert");
+                    }
+
+                }
+                columnData.Add(new ColumnModel { HeaderText = "Possible Answers", KeyField = new List<string>() { "A" } });
+
+                //Adding answers
+                int count = 1;
+                while (PossibleAnswersDictionary.Count < 7)
+                {
+                    int randomCategory = RandomMode.Next(0, 10);
+                    if (!PossibleAnswersDictionary.ContainsKey((int)randomCategory))
+                    {
+                        KeyValuePair<int, string> pair = Categories.ElementAt((int)randomCategory);
+                        PossibleAnswersDictionary.Add(randomCategory, new KanbanModel { Id = $"Task {count}", Status = "A", Summary = pair.Value });
+                        count++;
+                    }
+                }
+                break;
+            case 2:
+                DeweyToDescription = false;
+                break;
+        }
+    }
+
+    public string RandomNumber(int length)
+    {
+        return new string(Enumerable.Repeat(numbers, length).Select(s => s[RandomMode.Next(s.Length)]).ToArray());
+    }
+    #endregion
+}
