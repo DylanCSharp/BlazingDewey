@@ -2,9 +2,11 @@
 
 @using Syncfusion.Blazor.Kanban
 @using Syncfusion.Blazor.Buttons
-@using Syncfusion.Blazor.Spinner  
+@using Syncfusion.Blazor.Notifications  
 
-
+<SfToast @ref="toastStandard" ID="toast_type">
+    <ToastPosition X="Right" Y="Top"></ToastPosition>
+</SfToast>
     <div id="IdentifyAreaHomeCard" style="background-color: white">
         <div class="container-fluid text-center">
             <div class="pt-3">
@@ -14,16 +16,15 @@
                         <KanbanColumns>
                             @foreach (var item in columnDataDictionary.Values)
                             {
-                                <KanbanColumn HeaderText="@item.HeaderText" MaxCount="@item.MaxCount" KeyField="@item.KeyField"></KanbanColumn>
+                                <KanbanColumn HeaderText="@item.HeaderText"  MaxCount="@item.MaxCount" KeyField="@item.KeyField"></KanbanColumn>
                             }
                         </KanbanColumns>
                         <KanbanCardSettings HeaderField="Summary"></KanbanCardSettings>
                     </SfKanban>
-                    <div class="pr-3">
+                    <div class="mt-2 pr-3">
                         <SfButton CssClass="float-right" OnClick="SubmitGame">Submit</SfButton>
                     </div>
                 }
-
                 else if (DeweyToDescription is true)
                 {
 
@@ -44,7 +45,9 @@
 
     #region declarations
     const string numbers = "0123456789";
+
     public SfKanban<KanbanModel> kanbanReference;
+    public SfToast toastStandard;
 
     //Boolean
     public bool DeweyToDescription { get; set; }
@@ -79,14 +82,13 @@
         switch (modeChosen)
         {
             case 1:
+                #region Dewey-Description
                 DeweyToDescription = true;
-
                 //Adding Columns
                 int columnCount = 0;
                 string randomColOne = RandomNumber(3);
                 string trimmingFirstCol = randomColOne.Remove(1, 2);
-
-                columnDataDictionary.Add(trimmingFirstCol,new ColumnModel { HeaderText = randomColOne, KeyField = new List<string>() { $"1" }, MaxCount = 1 });
+                columnDataDictionary.Add(trimmingFirstCol,new ColumnModel { HeaderText = "Call Number: " + randomColOne, KeyField = new List<string>() { $"1" }, MaxCount = 1 });
                 while (columnDataDictionary.Count < 4)
                 {
                     string randomNumber = RandomNumber(3);
@@ -94,12 +96,11 @@
 
                     if (!columnDataDictionary.ContainsKey(checkFirstNumber))
                     {
-                        columnDataDictionary.Add(checkFirstNumber,new ColumnModel { HeaderText = randomNumber, KeyField = new List<string>() { $"{columnCount + 2}" }, MaxCount = 1 });
+                        columnDataDictionary.Add(checkFirstNumber,new ColumnModel { HeaderText = "Call Number: " + randomNumber, KeyField = new List<string>() { $"{columnCount + 2}" }, MaxCount = 1 });
                         columnCount++;
                     }
                 }
                 columnDataDictionary.Add("A", new ColumnModel { HeaderText = "Possible Answers", KeyField = new List<string>() { "A" } });
-
                 //Adding answers: 4 of which have to be correct in correspondance with call numbers
                 int foreachCount = 1;
                 foreach (var item in columnDataDictionary.Keys)
@@ -119,7 +120,6 @@
                             foreachCount++;
                             break;
                         case "3":
-
                             PossibleAnswersDictionary.Add(3, new KanbanModel { Id = $"Task {foreachCount}", Status = "A", Summary = "Social Sciences"});
                             foreachCount++;
                             break;
@@ -151,7 +151,7 @@
                             break;
                     }
                 }
-                int count = 4;
+                int count = 5;
                 while (PossibleAnswersDictionary.Count < 7)
                 {
                     int randomCategory = RandomMode.Next(0, 10);
@@ -163,18 +163,50 @@
                     }
                 }
                 break;
+            #endregion
             case 2:
+                #region Description-Dewey
                 DeweyToDescription = false;
                 break;
+                #endregion
         }
     }
 
-    private void SubmitGame()
+    private async void SubmitGame()
     {
-        var list = kanbanReference.GetColumnData(new List<string>(){ "1" });
-        var listTwo = kanbanReference.GetColumnData(new List<string>() { "2" });
-        var listThree = kanbanReference.GetColumnData(new List<string>() { "3" });
-        var listFour = kanbanReference.GetColumnData(new List<string>() { "4" });
+        List<bool> correctAnswers = new();
+        //Getting the answers for each column
+        var list = kanbanReference.GetColumnData(new List<string>() { "1" }, PossibleAnswersDictionary.Values);
+        var listTwo = kanbanReference.GetColumnData(new List<string>() { "2" }, PossibleAnswersDictionary.Values);
+        var listThree = kanbanReference.GetColumnData(new List<string>() { "3" }, PossibleAnswersDictionary.Values);
+        var listFour = kanbanReference.GetColumnData(new List<string>() { "4" }, PossibleAnswersDictionary.Values);
+
+        if (list.Count == 0 || listTwo.Count == 0 || listThree.Count == 0 || listFour.Count == 0)
+        {
+            await this.toastStandard.Show(new ToastModel { Title = $"Oh goodness!", Content = $"Looks like you forgot to add a description to a column!", CssClass = "e-toast-warning", Icon = "e-warning toast-icons", Timeout = 5000, ShowCloseButton = true });
+        }
+        else if (list.Count > 1 || listTwo.Count > 1 || listThree.Count > 1 || listFour.Count > 1)
+        {
+            await this.toastStandard.Show(new ToastModel { Title = $"Oh no!", Content = $"You cannot have more than one description in a column!", CssClass = "e-toast-warning", Icon = "e-warning toast-icons", Timeout = 5000, ShowCloseButton = true });
+        }
+        else
+        {
+            if (list[0].Id is "Task 1" && listTwo[0].Id is "Task 2" && listThree[0].Id is "Task 3" && listFour[0].Id is "Task 4")
+            {
+                correctAnswers.Add(true);
+            }
+            if (correctAnswers.Count is 1)
+            {
+                //Which means all answers have to had been correct
+                await this.toastStandard.Show(new ToastModel { Title = $"Well Done!", Content = $"You ordered the deweys and descriptions correctly!", CssClass = "e-toast-success", Icon = "e-success toast-icons", Timeout = 5000, ShowCloseButton = true });
+            }
+            else
+            {
+                await this.toastStandard.Show(new ToastModel { Title = $"Oops!", Content = $"Deweys dont match their descriptions. Keep trying!", CssClass = "e-toast-warning", Icon = "e-warning toast-icons", Timeout = 5000, ShowCloseButton = true });
+            }
+        }
+
+
     }
 
     public string RandomNumber(int length)
