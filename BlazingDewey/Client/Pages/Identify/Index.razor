@@ -12,22 +12,35 @@
             <div class="pt-3">
                 @if (DeweyToDescription is true)
                 {
+                    <h5 class="text-secondary pt-3 pb-3">Match the Deweys to the Descriptions!</h5>
                     <SfKanban Width="100%" @ref="kanbanReference" TValue="KanbanModel" KeyField="Status" DataSource="PossibleAnswersDictionary.Values.OrderBy(x => RandomMode.Next()).ToList()" AllowDragAndDrop="true" ConstraintType="ConstraintType.Column">
                         <KanbanColumns>
                             @foreach (var item in columnDataDictionary.Values)
                             {
-                                <KanbanColumn HeaderText="@item.HeaderText"  MaxCount="@item.MaxCount" KeyField="@item.KeyField"></KanbanColumn>
+                                <KanbanColumn HeaderText="@item.HeaderText" MaxCount="@item.MaxCount" KeyField="@item.KeyField"></KanbanColumn>
                             }
                         </KanbanColumns>
                         <KanbanCardSettings HeaderField="Summary"></KanbanCardSettings>
                     </SfKanban>
                     <div class="mt-2 pr-3">
-                        <SfButton CssClass="float-right" OnClick="SubmitGame">Submit</SfButton>
+                        <SfButton CssClass="float-right" OnClick="(() => SubmitGame(true))">Submit</SfButton>
                     </div>
                 }
-                else if (DeweyToDescription is true)
+                else if (DeweyToDescription is false)
                 {
-
+                    <h5 class="text-secondary pt-3 pb-3">Match the Descriptions to the Deweys!</h5>
+                    <SfKanban Width="100%" @ref="kanbanReference" TValue="KanbanModel" KeyField="Status" DataSource="PossibleAnswersDictionaryDescription.Values.OrderBy(x => RandomMode.Next()).ToList()" AllowDragAndDrop="true" ConstraintType="ConstraintType.Column">
+                        <KanbanColumns>
+                            @foreach (var item in columnDataDictionary.Values)
+                            {
+                                <KanbanColumn HeaderText="@item.HeaderText" MaxCount="@item.MaxCount" KeyField="@item.KeyField"></KanbanColumn>
+                            }
+                        </KanbanColumns>
+                        <KanbanCardSettings HeaderField="Summary"></KanbanCardSettings>
+                    </SfKanban>
+                    <div class="mt-2 pr-3">
+                        <SfButton CssClass="float-right" OnClick="(() => SubmitGame(false))">Submit</SfButton>
+                    </div>
                 }
             </div>
         </div>
@@ -50,6 +63,7 @@
     public SfToast toastStandard;
 
     //Boolean
+    [Parameter]
     public bool DeweyToDescription { get; set; }
 
     //Random
@@ -59,6 +73,7 @@
     //Dictionaries
     public Dictionary<string, ColumnModel> columnDataDictionary = new();
     public Dictionary<int, KanbanModel> PossibleAnswersDictionary { get; set; } = new();
+    public Dictionary<string, KanbanModel> PossibleAnswersDictionaryDescription { get; set; } = new();
     public Dictionary<int, string> Categories = new()
     {
         { 0, "General Knowledge" },
@@ -75,6 +90,7 @@
     #endregion
 
     #region functions
+
     protected override void OnInitialized()
     {
         //Randomly chooses if it is matching deweys to descriptions or vice versa to promote replayability
@@ -84,11 +100,12 @@
             case 1:
                 #region Dewey-Description
                 DeweyToDescription = true;
+                columnDataDictionary.Clear();
                 //Adding Columns
                 int columnCount = 0;
                 string randomColOne = RandomNumber(3);
                 string trimmingFirstCol = randomColOne.Remove(1, 2);
-                columnDataDictionary.Add(trimmingFirstCol,new ColumnModel { HeaderText = "Call Number: " + randomColOne, KeyField = new List<string>() { $"1" }, MaxCount = 1 });
+                columnDataDictionary.Add(trimmingFirstCol, new ColumnModel { HeaderText = "Call Number: " + randomColOne, KeyField = new List<string>() { $"1" }, MaxCount = 1 });
                 while (columnDataDictionary.Count < 4)
                 {
                     string randomNumber = RandomNumber(3);
@@ -96,7 +113,7 @@
 
                     if (!columnDataDictionary.ContainsKey(checkFirstNumber))
                     {
-                        columnDataDictionary.Add(checkFirstNumber,new ColumnModel { HeaderText = "Call Number: " + randomNumber, KeyField = new List<string>() { $"{columnCount + 2}" }, MaxCount = 1 });
+                        columnDataDictionary.Add(checkFirstNumber, new ColumnModel { HeaderText = "Call Number: " + randomNumber, KeyField = new List<string>() { $"{columnCount + 2}" }, MaxCount = 1 });
                         columnCount++;
                     }
                 }
@@ -120,7 +137,7 @@
                             foreachCount++;
                             break;
                         case "3":
-                            PossibleAnswersDictionary.Add(3, new KanbanModel { Id = $"Task {foreachCount}", Status = "A", Summary = "Social Sciences"});
+                            PossibleAnswersDictionary.Add(3, new KanbanModel { Id = $"Task {foreachCount}", Status = "A", Summary = "Social Sciences" });
                             foreachCount++;
                             break;
                         case "4":
@@ -167,19 +184,122 @@
             case 2:
                 #region Description-Dewey
                 DeweyToDescription = false;
+                columnDataDictionary.Clear();
+                int columnCountDescription = 0;
+                string randomColOneDescription = Categories[RandomMode.Next(1, 10)];
+                columnDataDictionary.Add(randomColOneDescription, new ColumnModel { HeaderText = randomColOneDescription, KeyField = new List<string>() { $"1" }, MaxCount = 1 });
+                while (columnDataDictionary.Count < 4)
+                {
+                    string randomDescription = Categories[RandomMode.Next(1, 10)];
+
+                    if (!columnDataDictionary.ContainsKey(randomDescription))
+                    {
+                        columnDataDictionary.Add(randomDescription, new ColumnModel { HeaderText = randomDescription, KeyField = new List<string>() { $"{columnCountDescription + 2}" }, MaxCount = 1 });
+                        columnCountDescription++;
+                    }
+                }
+                columnDataDictionary.Add("A", new ColumnModel { HeaderText = "Possible Answers", KeyField = new List<string>() { "A" } });
+
+                int foreachCountDescription = 1;
+                foreach (var item in columnDataDictionary.Keys)
+                {
+                    switch (item)
+                    {
+                        case "General Knowledge":
+                            PossibleAnswersDictionaryDescription.Add("General Knowledge", new KanbanModel { Id = $"Task {foreachCountDescription}", Status = "A", Summary = "0" + RandomNumber(2) });
+                            foreachCountDescription++;
+                            break;
+                        case "Philosophy and Psychology":
+                            PossibleAnswersDictionaryDescription.Add("Philosophy and Psychology", new KanbanModel { Id = $"Task {foreachCountDescription}", Status = "A", Summary = "1" + RandomNumber(2) });
+                            foreachCountDescription++;
+                            break;
+                        case "Religion":
+                            PossibleAnswersDictionaryDescription.Add("Religion", new KanbanModel { Id = $"Task {foreachCountDescription}", Status = "A", Summary = "2" + RandomNumber(2) });
+                            foreachCountDescription++;
+                            break;
+                        case "Social Sciences":
+                            PossibleAnswersDictionaryDescription.Add("Social Sciences", new KanbanModel { Id = $"Task {foreachCountDescription}", Status = "A", Summary = "3" + RandomNumber(2) });
+                            foreachCountDescription++;
+                            break;
+                        case "Languages":
+                            PossibleAnswersDictionaryDescription.Add("Languages", new KanbanModel { Id = $"Task {foreachCountDescription}", Status = "A", Summary = "4" + RandomNumber(2) });
+                            foreachCountDescription++;
+                            break;
+                        case "Science":
+                            PossibleAnswersDictionaryDescription.Add("Science", new KanbanModel { Id = $"Task {foreachCountDescription}", Status = "A", Summary = "5" + RandomNumber(2) });
+                            foreachCountDescription++;
+                            break;
+                        case "Technology":
+                            PossibleAnswersDictionaryDescription.Add("Technology", new KanbanModel { Id = $"Task {foreachCountDescription}", Status = "A", Summary = "6" + RandomNumber(2) });
+                            foreachCountDescription++;
+                            break;
+                        case "Arts and Recreation":
+                            PossibleAnswersDictionaryDescription.Add("Arts and Recreation", new KanbanModel { Id = $"Task {foreachCountDescription}", Status = "A", Summary = "7" + RandomNumber(2) });
+                            foreachCountDescription++;
+                            break;
+                        case "Literature":
+                            PossibleAnswersDictionaryDescription.Add("Literature", new KanbanModel { Id = $"Task {foreachCountDescription}", Status = "A", Summary = "8" + RandomNumber(2) });
+                            foreachCountDescription++;
+                            break;
+                        case "History and Geography":
+                            PossibleAnswersDictionaryDescription.Add("History and Geography", new KanbanModel { Id = $"Task {foreachCountDescription}", Status = "A", Summary = "9" + RandomNumber(2) });
+                            foreachCountDescription++;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                int countDescription = 5;
+                while (PossibleAnswersDictionaryDescription.Count < 7)
+                {
+                    string randomDescription = Categories[RandomMode.Next(1, 10)];
+                    if (!PossibleAnswersDictionaryDescription.ContainsKey(randomDescription))
+                    {
+                        var pair = Categories.FirstOrDefault(x => x.Value.Equals(randomDescription));
+                        PossibleAnswersDictionaryDescription.Add(randomDescription, new KanbanModel { Id = $"Task {countDescription}", Status = "A", Summary = pair.Key + RandomNumber(2) });
+                        countDescription++;
+                    }
+                }
                 break;
                 #endregion
         }
     }
 
-    private async void SubmitGame()
+    public async Task Toasts(bool gameType)
+    {
+        if (gameType is true)
+        {
+            await toastStandard.ShowAsync(new ToastModel { Title = $"Info!", Content = $"Random Mode Selected: Match the Deweys with the Descriptions!", CssClass = "e-toast-info", Icon = "e-info toast-icons", Timeout = 5000, ShowCloseButton = true });
+        }
+        if (gameType is false)
+        {
+            await toastStandard.ShowAsync(new ToastModel { Title = $"Info!", Content = $"Random Mode Selected: Match the Descriptions with the Deweys!", CssClass = "e-toast-info", Icon = "e-info toast-icons", Timeout = 5000, ShowCloseButton = true });
+        }
+    }
+
+    private async void SubmitGame(bool gameType)
     {
         List<bool> correctAnswers = new();
+        List<KanbanModel> list = new();
+        List<KanbanModel> listTwo = new();
+        List<KanbanModel> listThree = new();
+        List<KanbanModel> listFour = new();
+
         //Getting the answers for each column
-        var list = kanbanReference.GetColumnData(new List<string>() { "1" }, PossibleAnswersDictionary.Values);
-        var listTwo = kanbanReference.GetColumnData(new List<string>() { "2" }, PossibleAnswersDictionary.Values);
-        var listThree = kanbanReference.GetColumnData(new List<string>() { "3" }, PossibleAnswersDictionary.Values);
-        var listFour = kanbanReference.GetColumnData(new List<string>() { "4" }, PossibleAnswersDictionary.Values);
+        if (gameType is true)
+        {
+            list = kanbanReference.GetColumnData(new List<string>() { "1" }, PossibleAnswersDictionary.Values);
+            listTwo = kanbanReference.GetColumnData(new List<string>() { "2" }, PossibleAnswersDictionary.Values);
+            listThree = kanbanReference.GetColumnData(new List<string>() { "3" }, PossibleAnswersDictionary.Values);
+            listFour = kanbanReference.GetColumnData(new List<string>() { "4" }, PossibleAnswersDictionary.Values);
+        }
+        else
+        {
+            list = kanbanReference.GetColumnData(new List<string>() { "1" }, PossibleAnswersDictionaryDescription.Values);
+            listTwo = kanbanReference.GetColumnData(new List<string>() { "2" }, PossibleAnswersDictionaryDescription.Values);
+            listThree = kanbanReference.GetColumnData(new List<string>() { "3" }, PossibleAnswersDictionaryDescription.Values);
+            listFour = kanbanReference.GetColumnData(new List<string>() { "4" }, PossibleAnswersDictionaryDescription.Values);
+        }
 
         if (list.Count == 0 || listTwo.Count == 0 || listThree.Count == 0 || listFour.Count == 0)
         {
@@ -205,8 +325,6 @@
                 await this.toastStandard.Show(new ToastModel { Title = $"Oops!", Content = $"Deweys dont match their descriptions. Keep trying!", CssClass = "e-toast-warning", Icon = "e-warning toast-icons", Timeout = 5000, ShowCloseButton = true });
             }
         }
-
-
     }
 
     public string RandomNumber(int length)
