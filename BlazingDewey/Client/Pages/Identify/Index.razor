@@ -85,6 +85,7 @@
 
 @code {
 
+    //Region for declarations
     #region declarations
     const string numbers = "0123456789";
 
@@ -103,6 +104,8 @@
     public Dictionary<string, ColumnModel> columnDataDictionary = new();
     public Dictionary<int, KanbanModel> PossibleAnswersDictionary { get; set; } = new();
     public Dictionary<string, KanbanModel> PossibleAnswersDictionaryDescription { get; set; } = new();
+
+    //Dictionary full of the categories in the dewey system
     public Dictionary<int, string> Categories = new()
     {
         { 0, "General Knowledge" },
@@ -118,6 +121,7 @@
     };
     #endregion
 
+    //Region for functions/methods
     #region functions
 
     protected override void OnInitialized()
@@ -136,6 +140,7 @@
                 //Adding Columns
                 int columnCount = 0;
                 string randomColOne = RandomNumber(3);
+                //ADDING THE DEWEY TOP LEVEL NUMBERS X4
                 string trimmingFirstCol = randomColOne.Remove(1, 2);
                 columnDataDictionary.Add(trimmingFirstCol, new ColumnModel { HeaderText = "Call Number: " + randomColOne, KeyField = new List<string>() { $"1" }, MaxCount = 1 });
                 while (columnDataDictionary.Count < 4)
@@ -150,10 +155,12 @@
                     }
                 }
                 columnDataDictionary.Add("A", new ColumnModel { HeaderText = "Possible Answers", KeyField = new List<string>() { "A" } });
+
                 //Adding answers: 4 of which have to be correct in correspondance with call numbers
                 int foreachCount = 1;
                 foreach (var item in columnDataDictionary.Keys)
                 {
+                    //Making sure theres atleast four correct answers in the dictionary
                     switch (item)
                     {
                         case "0":
@@ -201,6 +208,7 @@
                     }
                 }
                 int count = 5;
+                //Adding 3 random wrong answers to the dictionary
                 while (PossibleAnswersDictionary.Count < 7)
                 {
                     int randomCategory = RandomMode.Next(0, 10);
@@ -218,6 +226,7 @@
                 DeweyToDescription = false;
                 int columnCountDescription = 0;
                 string randomColOneDescription = Categories[RandomMode.Next(1, 10)];
+                //ADDING THE DESCRIPTIONS  X4
                 columnDataDictionary.Add(randomColOneDescription, new ColumnModel { HeaderText = randomColOneDescription, KeyField = new List<string>() { $"1" }, MaxCount = 1 });
                 while (columnDataDictionary.Count < 4)
                 {
@@ -232,6 +241,7 @@
                 columnDataDictionary.Add("A", new ColumnModel { HeaderText = "Possible Answers", KeyField = new List<string>() { "A" } });
 
                 int foreachCountDescription = 1;
+                //ADDING DEWEY TOP LEVEL NUMBERS THAT CORRESPOND TO THE DESCRIPTIONS
                 foreach (var item in columnDataDictionary.Keys)
                 {
                     switch (item)
@@ -280,6 +290,7 @@
                             break;
                     }
                 }
+                //ADDING 3 RANDOM DEWEY TOP LEVEL NUMBERS SO THAT THERES FOUR CORRECT ANSWERS
                 int countDescription = 5;
                 while (PossibleAnswersDictionaryDescription.Count < 7)
                 {
@@ -304,7 +315,9 @@
         List<KanbanModel> listThree = new();
         List<KanbanModel> listFour = new();
 
-        //Getting the answers for each column
+        //Getting the answers for each column of the kanban
+        //Game Type is true if it is dewey to description
+        //False if it is description to dewey
         if (gameType is true)
         {
             list = kanbanReference.GetColumnData(new List<string>() { "1" }, PossibleAnswersDictionary.Values);
@@ -320,6 +333,7 @@
             listFour = kanbanReference.GetColumnData(new List<string>() { "4" }, PossibleAnswersDictionaryDescription.Values);
         }
 
+        //Validating inputs by user
         if (list.Count == 0 || listTwo.Count == 0 || listThree.Count == 0 || listFour.Count == 0)
         {
             await this.toastStandard.Show(new ToastModel { Title = $"Oh goodness!", Content = $"Looks like you forgot to add a description to a column!", CssClass = "e-toast-warning", Icon = "e-warning toast-icons", Timeout = 5000, ShowCloseButton = true });
@@ -330,6 +344,7 @@
         }
         else
         {
+            //Checking each column id is equal to the correct Task
             if (list[0].Id is "Task 1" && listTwo[0].Id is "Task 2" && listThree[0].Id is "Task 3" && listFour[0].Id is "Task 4")
             {
                 correctAnswers.Add(true);
@@ -356,6 +371,7 @@
         }
     }
 
+    //Starts a new game and alerts the user
     private async void StartNewGame()
     {
         await this.toastStandard.Show(new ToastModel { Title = $"Go Go Go!", Content = $"New Game has started!", CssClass = "e-toast-info", Icon = "e-info toast-icons", Timeout = 5000, ShowCloseButton = true });
@@ -367,6 +383,7 @@
         navManager.NavigateTo("");
     }
 
+    //Generates random rumbers
     public string RandomNumber(int length)
     {
         return new string(Enumerable.Repeat(numbers, length).Select(s => s[RandomMode.Next(s.Length)]).ToArray());
