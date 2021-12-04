@@ -1,0 +1,113 @@
+﻿@page "/dewey/findindex"
+
+@using System.IO
+
+@inject HttpClient Http
+
+@code {
+
+    public TreeDataStructure tree = new();
+    public Random random = new();
+    public Dictionary<int, string> Categories = new()
+    {
+        { 0, "General Knowledge" },
+        { 1, "Philosophy and Psychology" },
+        { 2, "Religion" },
+        { 3, "Social Sciences" },
+        { 4, "Languages"},
+        { 5, "Science"},
+        { 6, "Technology"},
+        { 7, "Arts and Recreation"},
+        { 8, "Literature" },
+        { 9, "History and Geography"}
+    };
+
+    public Dictionary<int, string> PossibleAnswers = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var fileData = await Http.GetStringAsync(@"deweydata.txt");
+        var fileArray = fileData.Split('\n');
+
+        //Inserting all the items into the tree and into memory
+        foreach (var item in fileArray)
+        {
+            tree.Insert(item);
+        }
+
+        //Randomly select a node
+        var randomNodeNumber = TreeDataStructure.CallNumbers[random.Next(TreeDataStructure.CallNumbers.Count)];
+        Node node = tree.Search(randomNodeNumber);
+
+        Console.WriteLine(node.Data + " " + node.Description);
+
+        var firstDigit = GetFirstDigit(node.Data);
+
+        Console.WriteLine(firstDigit);
+
+        //Get 4 top level descriptions, 1 correct and 3 incorrect
+
+        //Adding the correct answer
+        switch (firstDigit)
+        {
+            case 0:
+                PossibleAnswers.Add(0,"General Knowledge");
+                break;
+            case 1:
+                PossibleAnswers.Add(1,"Philosophy and Psychology");
+                break;
+            case 2:
+                PossibleAnswers.Add(2,"Religion");
+                break;
+            case 3:
+                PossibleAnswers.Add(3,"Social Sciences");
+                break;
+            case 4:
+                PossibleAnswers.Add(4,"Languages");
+                break;
+            case 5: 
+                PossibleAnswers.Add(5,"Science");
+                break;
+            case 6:
+                PossibleAnswers.Add(6,"Technology");
+                break;
+            case 7:
+                PossibleAnswers.Add(7,"Arts and Recreation");
+                break;
+            case 8:
+                PossibleAnswers.Add(8,"Literature");
+                break;
+            case 9:
+                PossibleAnswers.Add(9,"History and Geography");
+                break;
+            default:
+                break;
+        }
+
+        //Do checks for if it starts with 0
+
+
+        //Give the user the chance to choose which broad area. 
+        // User chooses 700
+
+        //If correct, show answers within the 700 range. 
+        // User chooses 750
+
+        //If correct, show answers within the 750 range.
+        //User chooses 751
+
+        //If correct, next question 
+
+        //5 questions with a timer and scoreboard
+    }
+
+    public int GetFirstDigit(int number) 
+    {
+      if ( number < 10 ) 
+      {
+        return number;
+      }
+      return GetFirstDigit ( (number - (number % 10)) / 10);
+    }
+
+}

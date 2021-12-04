@@ -47,7 +47,7 @@
             </CardContent>
             <CardFooter>
                 <CardFooterContent>
-                    <SfButton CssClass="float-right" Disabled="true">View</SfButton>
+                    <SfButton CssClass="float-right" OnClick="Find">View</SfButton>
                 </CardFooterContent>
             </CardFooter>
         </SfCard>
@@ -78,6 +78,11 @@
     private void IdentifyAreas()
     {
         navManager.NavigateTo("dewey/identifyareasindex");
+    }
+
+    private void Find()
+    {
+        navManager.NavigateTo("dewey/findindex");
     }
 }
 

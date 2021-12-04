@@ -1,0 +1,93 @@
+070:Journalism and Publishing
+071:North America
+072:Great Britain
+073:Germany and Central Europe
+074:France and Monaco
+075:Italy, Malta, San Marino and Vatican City
+076:Iberian Peninsula
+077:Russia and Eastern Europe
+078:Scandinavia
+079:Other Languages
+150:Psychology
+151:Psychophysiology 
+152:Emotions and Senses
+153:Cognition and Memory
+154:Subconsciousness 
+155:Developmental and Differential Psychology
+156:Animal Psychology 
+157:Psychopathology
+158:Applied Psychology
+159:Will
+220:Bible
+221:Old Testament
+222:Historical Books
+223:Poetic Books
+224:Prophetic Books
+225:New Testament 
+226:Gospel and Acts
+227:Epistles
+228:Apocalypse 
+229:Apocrypha
+310:Statistics
+311:Theories and Methods
+312:Population 
+313:Special Topics
+314:Europe 
+315:Asia
+316:Africa
+317:North America
+318:South America 
+319:Pacific
+471:Orthography 
+472:Etymology
+473:Dictionaries 
+474:Synonyms 
+475:Grammar 
+476:Prosody 
+477:Dialects
+478:School Texts
+479:Minor Italic; Medieval Latin
+591:Specific Topics in natural history of animals
+592:Invertebrates 
+594:Protozoa; Radiates
+595:Arthropoda
+596:Vertebrates 
+597:Cold-blooded vertebrates, fishes
+598:Birds 
+599:Mammals
+641:Food and Drinks
+642:Meals and Table Service; Menus
+643:Housing and household equipment 
+644:Utilities 
+645:Style and Interior
+646:Sewing and Clothing and Management of Life
+647:Hospitality and Property Management
+648:Housework and Moving
+649:Parenting and Caregiving 
+721:Architectural Construction
+722:Ancient and Oriental 
+723:Medieval Gothic 
+724:Modern
+725:Public Buildings
+726:Ecclesiastic and Religious
+727:Educational and Scientific 
+728:Residential Buildings 
+729:Design and Decoration
+861:Spanish Poetry
+862:Spanish Drama
+863:Spanish Fiction
+864:Spanish Essays
+865:Spanish Speeches
+866:Spanish Letters
+867:Spanish wit and humor
+868:Spanish Authors and Spanish Miscellany 
+869:Portuguese
+981:Brazil 
+982:Argentina 
+983:Chile
+984:Bolivia 
+985:Peru
+986:Columbia; Ecuador; Panama and Panama Canal
+987:Venezuela 
+988:French Guiana; Guyana and Suriname
+989:Paraguay; Uruguay
