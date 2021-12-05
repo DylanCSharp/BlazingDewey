@@ -1,13 +1,116 @@
 ﻿@page "/dewey/findindex"
 
-@using System.IO
-
 @inject HttpClient Http
 
-@code {
+@using System.IO
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Notifications
 
+
+<SfToast @ref="toastStandard" ID="toast_type">
+    <ToastPosition X="Right" Y="Top"></ToastPosition>
+</SfToast>
+<SfCard>
+    <CardContent>
+        <div>
+        <p class="float-right">Correct Answers: @CorrectAnswers</p>
+        </div>
+        @if (FirstPhase)
+        {
+            @if (NodeSelected.ThirdLevelDescription is not null)
+            {
+                <h6>Random 3rd Level Description selected is:</h6>
+                <h5 class="text-secondary">@NodeSelected.ThirdLevelDescription</h5>
+                <br>
+                <p>Pick the appropriate 1st Level Description and submit</p>
+            }
+            <div class="form-row pt-2 pb-2">
+            <SfDropDownList Placeholder="Select an Answer" TValue="string" TItem="string" DataSource="@PossibleAnswers.Values" @bind-Value="AnswerOne"></SfDropDownList>
+            </div>
+            <div class="form-row pt-2 pb-2">
+                <SfButton Content="Submit" OnClick="ValidateFirstPhase"></SfButton>
+            </div>
+        }
+        else if (SecondPhase)
+        {
+            @if (NodeSelected.ThirdLevelDescription is not null)
+            {
+                Dictionary<int, string> AnswersForQuestionTwo = new();
+
+                switch (AnswerOne)
+                {
+                     case "General Knowledge":
+                        AnswersForQuestionTwo = General;
+                        break;
+                    case "Philosophy and Psychology":
+                        AnswersForQuestionTwo = Philosophy;
+                        break;
+                    case "Religion":
+                        AnswersForQuestionTwo = Religion;
+                        break;
+                    case "Social Sciences":
+                        AnswersForQuestionTwo = SocialSciences;
+                        break;
+                    case "Languages":
+                        AnswersForQuestionTwo = Langauge;
+                        break;
+                    case "Science":
+                        AnswersForQuestionTwo = Science;
+                        break;
+                        case "Technology":
+                        AnswersForQuestionTwo = Technology;
+                        break;
+                    case "Arts and Recreation":
+                        AnswersForQuestionTwo = Arts;
+                        break;
+                        case "Literature":
+                        AnswersForQuestionTwo = Literature;
+                        break;
+                    case "History and Geography":
+                        AnswersForQuestionTwo = HistoryAndGeog;
+                        break;
+                    default:
+                        break;
+                }
+                
+                <h6>Random 3rd Level Description selected is:</h6>
+                <h5 class="text-secondary">@NodeSelected.ThirdLevelDescription</h5>
+                <br>
+                <p>Pick the appropriate 2nd Level Description and submit</p>
+                <div class="form-row pt-2 pb-2">
+            <SfDropDownList Placeholder="Select an Answer" TValue="string" TItem="string" DataSource="@AnswersForQuestionTwo.Values" @bind-Value="AnswerTwo"></SfDropDownList>
+            </div>
+            <div class="form-row pt-2 pb-2">
+                <SfButton Content="Submit" OnClick="ValidateSecondPhase"></SfButton>
+            </div>
+            }
+        }
+    </CardContent>
+</SfCard>
+
+
+
+@code {
+    #region declarations
+
+    public SfToast toastStandard;
+
+    public int CorrectAnswers { get; set; } = 0;
+
+    public bool FirstPhase { get; set; } = true;
+    public bool SecondPhase { get; set; } = false;
+
+    public string AnswerOne { get; set; }
+    public string AnswerTwo { get; set; }
+
+    const string numbers = "0123456789";
     public TreeDataStructure tree = new();
+    public Node NodeSelected { get; set; } = new();
     public Random random = new();
+
+    #region dictionaries
     public Dictionary<int, string> Categories = new()
     {
         { 0, "General Knowledge" },
@@ -22,10 +125,155 @@
         { 9, "History and Geography"}
     };
 
+    public Dictionary<int, string> General = new()
+    {
+        { 1, "Bibliographies" },
+        { 2, "Library and Information Sciences" },
+        { 3, "Dictionaries and Encyclopedias" },
+        { 4, "Special Topics" },
+        { 5, "Periodicals" },
+        { 6, "Organizations" },
+        { 7, "Journalism and Publishing" },
+        { 8, "Anthologies and Quotations" },
+        { 9, "Manuscripts and rare books" }
+    };
+    public Dictionary<int, string> Philosophy = new()
+    {
+        { 1, "Metaphysics" },
+        { 2, "Philosophy of Humanity" },
+        { 3, "Parapsychology And Occultism" },
+        { 4, "Parapsychology And Occultism" },
+        { 5, "Psychology" },
+        { 6, "Logic" },
+        { 7, "Ethics" },
+        { 8, "Ancient, medievial and eastern philosophy" },
+        { 9, "Modern western philosophy" }
+    };
+    public Dictionary<int, string> Religion = new()
+    {
+        { 1, "Natural Theology" },
+        { 2, "Bible" },
+        { 3, "Christian doctrinal theology" },
+        { 4, "Christian Devotional Literature" },
+        { 5, "Christian Pastoral Theology" },
+        { 6, "Christian Church" },
+        { 7, "History of Christianity" },
+        { 8, "Christian Denominations" },
+        { 9, "Other Religions" }
+    };
+
+    public Dictionary<int, string> SocialSciences = new()
+    {
+        { 1, "Statistics" },
+        { 2, "Political Science" },
+        { 3, "Economics" },
+        { 4, "Law" },
+        { 5, "Public Administration, Military Science" },
+        { 6, "Social Problems" },
+        { 7, "Education" },
+        { 8, "Commerce, Communications and Transportation" },
+        { 9, "Customs, Folklore" }
+    };
+
+    public Dictionary<int, string> Langauge = new()
+    {
+        { 1, "Linguistics" },
+        { 2, "English" },
+        { 3, "German and Germanic" },
+        { 4, "French" },
+        { 5, "Italian" },
+        { 6, "Spanish" },
+        { 7, "Latin" },
+        { 8, "Greek" },
+        { 9, "Other Languages" }
+    };
+
+    public Dictionary<int, string> Science = new()
+    {
+        { 1, "Mathematics" },
+        { 2, "Astronomy" },
+        { 3, "Physics" },
+        { 4, "Chemistry" },
+        { 5, "Earth Sciences and Geology" },
+        { 6, "Fossils and Prehistoric Life" },
+        { 7, "Life Sciences and Biology" },
+        { 8, "Plants" },
+        { 9, "Animals" }
+    };
+
+    public Dictionary<int, string> Technology = new()
+    {
+        { 1, "Mediciine and Health" },
+        { 2, "Engineering and Operations" },
+        { 3, "Agriculture" },
+        { 4, "Home Management" },
+        { 5, "Management and Auxiliary Services" },
+        { 6, "Chemical Technology" },
+        { 7, "Manufacturing" },
+        { 8, "Specific Manufacturing" },
+        { 9, "Building" }
+    };
+
+    public Dictionary<int, string> Arts = new()
+    {
+        { 1, "Civic and landscape art" },
+        { 2, "Architecture" },
+        { 3, "Sculpture" },
+        { 4, "Drawing and decorative arts" },
+        { 5, "Painting" },
+        { 6, "Graphic arts" },
+        { 7, "Photography" },
+        { 8, "Music" },
+        { 9, "Amusements and Recreation" }
+    };
+
+    public Dictionary<int, string> Literature = new()
+    {
+        { 1, "English (North America)" },
+        { 2, "English (Not North America)" },
+        { 3, "German and Germanic" },
+        { 4, "French" },
+        { 5, "Italian" },
+        { 6, "Spanish Literature" },
+        { 7, "Latin" },
+        { 8, "Greek and other classic languages" },
+        { 9, "Literature of other languages" }
+    };
+
+    public Dictionary<int, string> HistoryAndGeog = new()
+    {
+        { 1, "Geography and Travel" },
+        { 2, "Biography" },
+        { 3, "History of Ancienct World" },
+        { 4, "History of Europe" },
+        { 5, "History of Asia" },
+        { 6, "History of Africa" },
+        { 7, "History of North America" },
+        { 8, "History of South America" },
+        { 9, "Pacific" }
+    };
+
+    #endregion
+
+
     public Dictionary<int, string> PossibleAnswers = new();
+
+    #endregion
+
+    #region functions
 
     protected override async Task OnInitializedAsync()
     {
+        await GetData();
+    }
+
+    private async Task GetData()
+    {
+        FirstPhase = true;
+        SecondPhase = false;
+        PossibleAnswers.Clear();
+        NodeSelected = new();
+
         var fileData = await Http.GetStringAsync(@"deweydata.txt");
         var fileArray = fileData.Split('\n');
 
@@ -36,78 +284,110 @@
         }
 
         //Randomly select a node
-        var randomNodeNumber = TreeDataStructure.CallNumbers[random.Next(TreeDataStructure.CallNumbers.Count)];
+        int randomNodeNumber = TreeDataStructure.CallNumbers[random.Next(TreeDataStructure.CallNumbers.Count)];
+        string checkNumberOfDigits = randomNodeNumber.ToString();
+
         Node node = tree.Search(randomNodeNumber);
-
-        Console.WriteLine(node.Data + " " + node.Description);
-
+        NodeSelected = node;
         var firstDigit = GetFirstDigit(node.Data);
 
-        Console.WriteLine(firstDigit);
-
-        //Get 4 top level descriptions, 1 correct and 3 incorrect
-
         //Adding the correct answer
-        switch (firstDigit)
+        if (checkNumberOfDigits.Length is 2)
         {
-            case 0:
-                PossibleAnswers.Add(0,"General Knowledge");
-                break;
-            case 1:
-                PossibleAnswers.Add(1,"Philosophy and Psychology");
-                break;
-            case 2:
-                PossibleAnswers.Add(2,"Religion");
-                break;
-            case 3:
-                PossibleAnswers.Add(3,"Social Sciences");
-                break;
-            case 4:
-                PossibleAnswers.Add(4,"Languages");
-                break;
-            case 5: 
-                PossibleAnswers.Add(5,"Science");
-                break;
-            case 6:
-                PossibleAnswers.Add(6,"Technology");
-                break;
-            case 7:
-                PossibleAnswers.Add(7,"Arts and Recreation");
-                break;
-            case 8:
-                PossibleAnswers.Add(8,"Literature");
-                break;
-            case 9:
-                PossibleAnswers.Add(9,"History and Geography");
-                break;
-            default:
-                break;
+            PossibleAnswers.Add(0,"General Knowledge");
+        }
+        else if (checkNumberOfDigits.Length is 3)
+        {
+            switch (firstDigit)
+            {
+                case 1:
+                    PossibleAnswers.Add(1,"Philosophy and Psychology");
+                    break;
+                case 2:
+                    PossibleAnswers.Add(2,"Religion");
+                    break;
+                case 3:
+                    PossibleAnswers.Add(3,"Social Sciences");
+                    break;
+                case 4:
+                    PossibleAnswers.Add(4,"Languages");
+                    break;
+                case 5: 
+                    PossibleAnswers.Add(5,"Science");
+                    break;
+                case 6:
+                    PossibleAnswers.Add(6,"Technology");
+                    break;
+                case 7:
+                    PossibleAnswers.Add(7,"Arts and Recreation");
+                    break;
+                case 8:
+                    PossibleAnswers.Add(8,"Literature");
+                    break;
+                case 9:
+                    PossibleAnswers.Add(9,"History and Geography");
+                    break;
+                default:
+                    break;
+            }
         }
 
-        //Do checks for if it starts with 0
+        //Adding the 3 incorrect answers
+        while (PossibleAnswers.Count < 5)
+        {
+            string randomAnswer = RandomNumber(1);
+            if (!PossibleAnswers.ContainsKey(Convert.ToInt32(randomAnswer)))
+            {
+                var keyvaluepair = Categories.FirstOrDefault(x => x.Key == Convert.ToInt32(randomAnswer));
+                PossibleAnswers.Add(Convert.ToInt32(randomAnswer), keyvaluepair.Value);
+            }
+        }
+    }
 
+    private async Task ValidateFirstPhase()
+    {
+        if (AnswerOne.Trim().Equals(NodeSelected.FirstLevelDescription.Trim()))
+        {
+            await this.toastStandard.Show(new ToastModel { Title = $"Yay!", Content = $"Your first answer is correct!", CssClass = "e-toast-success", Icon = "e-success toast-icons", Timeout = 5000, ShowCloseButton = true });
+            FirstPhase = false;
+            SecondPhase = true;
+        }
+        else
+        {
+            await this.toastStandard.Show(new ToastModel { Title = $"Oh no!", Content = $"Incorrect answer!", CssClass = "e-toast-warning", Icon = "e-warning toast-icons", Timeout = 5000, ShowCloseButton = true });
+        }
+    }
 
-        //Give the user the chance to choose which broad area. 
-        // User chooses 700
-
-        //If correct, show answers within the 700 range. 
-        // User chooses 750
-
-        //If correct, show answers within the 750 range.
-        //User chooses 751
-
-        //If correct, next question 
-
-        //5 questions with a timer and scoreboard
+    private async Task ValidateSecondPhase()
+    {
+        if (AnswerTwo.Trim().Equals(NodeSelected.SecondLevelDescription.Trim()))
+        {
+            await this.toastStandard.Show(new ToastModel { Title = $"Yay!", Content = $"Your second answer is correct. Going onto the next question!", CssClass = "e-toast-success", Icon = "e-success toast-icons", Timeout = 5000, ShowCloseButton = true });
+            await GetData();
+            AnswerOne = "";
+            AnswerTwo = "";
+            CorrectAnswers++;
+        }
+        else
+        {
+            await this.toastStandard.Show(new ToastModel { Title = $"Oh no!", Content = $"Incorrect answer!", CssClass = "e-toast-warning", Icon = "e-warning toast-icons", Timeout = 5000, ShowCloseButton = true });
+        }
     }
 
     public int GetFirstDigit(int number) 
     {
-      if ( number < 10 ) 
-      {
-        return number;
-      }
-      return GetFirstDigit ( (number - (number % 10)) / 10);
+          if ( number < 10 ) 
+          {
+            return number;
+          }
+          return GetFirstDigit ((number - (number % 10)) / 10);
     }
 
+    public string RandomNumber(int length)
+    {
+        return new string(Enumerable.Repeat(numbers, length).Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+
+    #endregion
 }

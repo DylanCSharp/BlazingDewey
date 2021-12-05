@@ -21,7 +21,9 @@ namespace BlazingDewey.Shared.Tree
             //Passing in the line from the file and then splitting up the number and description
             var lineArray = fileLine.Split(':');
             var number = Convert.ToInt32(lineArray[0]);
-            var description = lineArray[1];
+            var thirddescription = lineArray[1];
+            var seconddescription = lineArray[2];
+            var firstdescription = lineArray[3];
 
             CallNumbers.Add(number);
 
@@ -46,7 +48,9 @@ namespace BlazingDewey.Shared.Tree
 
             Node newNode = new();
             newNode.Data = number;
-            newNode.Description = description;
+            newNode.FirstLevelDescription = firstdescription;
+            newNode.SecondLevelDescription = seconddescription;
+            newNode.ThirdLevelDescription = thirddescription;
             if (Root is null)
             {
                 Root = newNode;
@@ -143,7 +147,7 @@ namespace BlazingDewey.Shared.Tree
         {
             if (parent != null)
             {
-                Console.WriteLine(parent.Data + " " + parent.Description);
+                Console.WriteLine(parent.Data + " " + parent.SecondLevelDescription + " " + parent.ThirdLevelDescription);
                 TraversePreOrder(parent.Left);
                 TraversePreOrder(parent.Right);
             }
@@ -154,7 +158,7 @@ namespace BlazingDewey.Shared.Tree
             if (parent != null)
             {
                 TraverseInOrder(parent.Left);
-                Console.WriteLine(parent.Data + " " + parent.Description);
+                Console.WriteLine(parent.Data + " " + parent.SecondLevelDescription + " " + parent.ThirdLevelDescription);
                 TraverseInOrder(parent.Right);
             }
         }
@@ -165,7 +169,7 @@ namespace BlazingDewey.Shared.Tree
             {
                 TraversePostOrder(parent.Left);
                 TraversePostOrder(parent.Right);
-                Console.WriteLine(parent.Data + " " + parent.Description);
+                Console.WriteLine(parent.Data + " " + parent.SecondLevelDescription + " " + parent.ThirdLevelDescription);
             }
         }
     }

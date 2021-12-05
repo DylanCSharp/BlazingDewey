@@ -11,6 +11,8 @@ namespace BlazingDewey.Shared.Tree
         public Node Left { get; set; }
         public Node Right { get; set; }
         public int Data { get; set; }
-        public string Description { get; set; }
+        public string FirstLevelDescription { get; set; }
+        public string SecondLevelDescription { get; set; }
+        public string ThirdLevelDescription { get; set; }
     }
 }
