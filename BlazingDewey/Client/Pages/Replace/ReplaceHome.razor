@@ -1,0 +1,38 @@
+﻿@page "/dewey/findindex"
+@page "/dewey/findindex/{score}"
+
+@inject NavigationManager navManager
+
+@using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Buttons
+
+<SfCard>
+    <CardContent>
+        <p>
+
+            <h5>Answer as many questions as you can within a minute!</h5>
+
+            @if (!String.IsNullOrEmpty(Score))
+            {
+                <p class="text-info">You scored @Score point (s) in 1 minute!!!</p>
+            }
+        </p>
+        <SfButton Content="Lets do it!" OnClick="StartGame"></SfButton>
+    </CardContent>
+</SfCard>
+
+@code {
+    [Parameter]
+    public string Score { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return base.OnParametersSetAsync();
+    }
+
+    private void StartGame()
+    {
+        Score = null;
+        navManager.NavigateTo("dewey/findgame");
+    }
+}

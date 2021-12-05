@@ -1,6 +1,7 @@
-﻿@page "/dewey/findindex"
+﻿@page "/dewey/findgame"
 
 @inject HttpClient Http
+@inject NavigationManager navManager
 
 @using System.IO
 @using Syncfusion.Blazor.DropDowns
@@ -14,8 +15,11 @@
 </SfToast>
 <SfCard>
     <CardContent>
+        <h5 class="text-secondary">Answer as many questions as you can in 1 minute</h5>
         <div>
-        <p class="float-right">Correct Answers: @CorrectAnswers</p>
+        <p>Time Left: @timeLeft.TotalSeconds seconds</p>
+        <p><label class="text-danger">@TimeOut</label>Fully Correct Answers: @CorrectAnswers</p>
+        <p></p>
         </div>
         @if (FirstPhase)
         {
@@ -97,6 +101,12 @@
 
     public SfToast toastStandard;
 
+    //Timer
+    TimeSpan timeLeft = new(0,0,60);
+    public string TimeOut { get; set; }
+    bool isRunning = false;
+
+
     public int CorrectAnswers { get; set; } = 0;
 
     public bool FirstPhase { get; set; } = true;
@@ -106,6 +116,8 @@
     public string AnswerTwo { get; set; }
 
     const string numbers = "0123456789";
+
+    //TREE
     public TreeDataStructure tree = new();
     public Node NodeSelected { get; set; } = new();
     public Random random = new();
@@ -125,6 +137,8 @@
         { 9, "History and Geography"}
     };
 
+
+    //All the child topics
     public Dictionary<int, string> General = new()
     {
         { 1, "Bibliographies" },
@@ -265,14 +279,40 @@
     protected override async Task OnInitializedAsync()
     {
         await GetData();
+        await Stopwatch();
+    }
+
+
+    public async Task Stopwatch()
+    {
+        while (timeLeft > new TimeSpan())
+        {
+            await Task.Delay(1000);
+            timeLeft = timeLeft.Subtract(new TimeSpan(0, 0, 1));
+            StateHasChanged();
+        }
+        await AfterTime();
+        StateHasChanged();
+        await Task.Delay(250);
+        //Ending the game after the timer runs out
+        navManager.NavigateTo($"dewey/findindex/{CorrectAnswers.ToString()}");
+    }
+
+    public Task AfterTime()
+    {
+        TimeOut = "Time has run out.";
+        
+        return Task.CompletedTask;
     }
 
     private async Task GetData()
     {
+        //Populating all the answers and choosing a random node
         FirstPhase = true;
         SecondPhase = false;
         PossibleAnswers.Clear();
         NodeSelected = new();
+        TimeOut = string.Empty;
 
         var fileData = await Http.GetStringAsync(@"deweydata.txt");
         var fileArray = fileData.Split('\n');
@@ -344,6 +384,7 @@
         }
     }
 
+    //Checking first phase of the answer
     private async Task ValidateFirstPhase()
     {
         if (AnswerOne.Trim().Equals(NodeSelected.FirstLevelDescription.Trim()))
@@ -358,6 +399,7 @@
         }
     }
 
+    //Checking second phase of the answer
     private async Task ValidateSecondPhase()
     {
         if (AnswerTwo.Trim().Equals(NodeSelected.SecondLevelDescription.Trim()))
@@ -374,6 +416,7 @@
         }
     }
 
+    //Gets the first digit so its easier to add to a dictionary
     public int GetFirstDigit(int number) 
     {
           if ( number < 10 ) 
@@ -383,6 +426,7 @@
           return GetFirstDigit ((number - (number % 10)) / 10);
     }
 
+    //Generates a random number
     public string RandomNumber(int length)
     {
         return new string(Enumerable.Repeat(numbers, length).Select(s => s[random.Next(s.Length)]).ToArray());

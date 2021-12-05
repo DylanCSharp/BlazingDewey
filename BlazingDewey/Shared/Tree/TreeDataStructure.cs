@@ -16,6 +16,7 @@ namespace BlazingDewey.Shared.Tree
             Root = null;
         }
 
+        //Populating the tree with the text file
         public bool Insert(string fileLine)
         {
             //Passing in the line from the file and then splitting up the number and description
@@ -69,6 +70,8 @@ namespace BlazingDewey.Shared.Tree
             return true;
         }
 
+        //Searches the tree for the node
+
         public Node Search(int value)
         {
             return Search(value, Root);
@@ -92,85 +95,6 @@ namespace BlazingDewey.Shared.Tree
                 }
             }
             return null;
-        }
-
-        public void Remove(int value)
-        {
-            Root = Remove(Root, value);
-
-        }
-
-        public Node Remove(Node parent, int key)
-        {
-            if (parent is null)
-            {
-                return parent;
-            }
-            if (key < parent.Data)
-            {
-                parent.Left = Remove(parent.Left, key);
-            }
-            else if (key > parent.Data)
-            {
-                parent.Right = Remove(parent.Right, key);
-            }
-            else
-            {
-                if (parent.Left is null)
-                {
-                    return parent.Right;
-                }
-                else if (parent.Right is null)
-                {
-                    return parent.Left;
-                }
-                parent.Data = MinValue(parent.Right);
-                parent.Right = Remove(parent.Right, parent.Data);
-            }
-            return parent;
-        }
-
-        public static int MinValue(Node node)
-        {
-            int minv = node.Data;
-
-            while (node.Left is not null)
-            {
-                minv = node.Left.Data;
-                node = node.Left;
-            }
-
-            return minv;
-        }
-
-        public void TraversePreOrder(Node parent)
-        {
-            if (parent != null)
-            {
-                Console.WriteLine(parent.Data + " " + parent.SecondLevelDescription + " " + parent.ThirdLevelDescription);
-                TraversePreOrder(parent.Left);
-                TraversePreOrder(parent.Right);
-            }
-        }
-
-        public void TraverseInOrder(Node parent)
-        {
-            if (parent != null)
-            {
-                TraverseInOrder(parent.Left);
-                Console.WriteLine(parent.Data + " " + parent.SecondLevelDescription + " " + parent.ThirdLevelDescription);
-                TraverseInOrder(parent.Right);
-            }
-        }
-
-        public void TraversePostOrder(Node parent)
-        {
-            if (parent != null)
-            {
-                TraversePostOrder(parent.Left);
-                TraversePostOrder(parent.Right);
-                Console.WriteLine(parent.Data + " " + parent.SecondLevelDescription + " " + parent.ThirdLevelDescription);
-            }
         }
     }
 }
