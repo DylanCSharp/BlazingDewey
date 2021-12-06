@@ -37,4 +37,15 @@ If you are correct, you will be prompted to restart a game and a random mode wil
 
 The numbers for the dewey system being used are the TOP LEVEL ONLY (FIRST THREE NUMBERS OF THE DEWEY DECIMAL)
 
+//PART THREE
+
+//File unzipping structure remains the same, follow first 6 lines of readme file.
+
+Navigate to the last tab and continue
+
+Once there, you will be prompted with instructions to get as many points as you can by answering the questions correctly.
+
+You will have a minute to get as many points as you can, this keeps users playing and helps them to work towards something.
+
+
 Welcome to Blazing Dewey/Books & HAVE FUN
